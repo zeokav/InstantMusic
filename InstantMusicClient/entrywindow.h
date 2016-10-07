@@ -3,9 +3,21 @@
 
 #include <QMainWindow>
 #include <QPushButton>
+#include <QDebug>
+
+class ServerInfo {
+    void test() {
+        qDebug() << "Test working";
+    }
+
+public:
+    ServerInfo() {
+
+    }
+};
 
 namespace Ui {
-class EntryWindow;
+    class EntryWindow;
 }
 
 class EntryWindow : public QMainWindow
@@ -22,6 +34,7 @@ private slots:
 private:
     Ui::EntryWindow *ui;
     QPushButton *p_btn;
+
 };
 
 #endif // ENTRYWINDOW_H
