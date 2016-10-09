@@ -2,7 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <netinet/in.h>
+#include <string.h>
 #include <sys/types.h>
+#include <fcntl.h>
+
+#define BUFFER_SIZE 2048
 
 int main(int argc, char *argv[]) {
     int sockfd;
@@ -25,7 +29,14 @@ int main(int argc, char *argv[]) {
         newsockfd = accept(sockfd, (struct sockaddr *)&client, &clen);
         pid_t pid = fork();
         if(pid == 0) {
-            printf("Client connection opened.");
+            printf("\nClient connection opened. Transferring.");
+            int fd = open("./MusicProvider/test.txt", O_RDONLY);
+            char buff[BUFFER_SIZE + 1];
+            while(read(fd, buff, BUFFER_SIZE)) {
+              printf("Sending...\n");
+              send(sockfd, buff, strlen(buff), 0);
+            };
+            close(fd);
             close(newsockfd);
             exit(1);
         }

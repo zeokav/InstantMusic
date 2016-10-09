@@ -8,6 +8,7 @@
 #include <QDebug>
 
 #define MAX 1000
+#define BUFFER_SIZE 2048
 
 EntryWindow::EntryWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -34,7 +35,16 @@ void EntryWindow::button_handle()
 
     ::connect(sockfd, (struct sockaddr *)&serv, sizeof(serv));
     qDebug() << "Connection established";
-    ::close(sockfd);
+    char c[BUFFER_SIZE + 1];
 
+//    system("mkdir transfers");
+    int fd = open("./transfers/test.txt", O_WRONLY | O_CREAT | O_TRUNC);
+    while(::recv(sockfd, c, BUFFER_SIZE, 0)) {
+        qDebug() << "Writing...";
+        write(fd, c, BUFFER_SIZE);
+    }
+    ::close(fd);
+    qDebug() << "File received!";
+    ::close(sockfd);
 
 }
