@@ -38,10 +38,13 @@ void EntryWindow::button_handle()
     char c[BUFFER_SIZE + 1];
 
 //    system("mkdir transfers");
-    int fd = open("./transfers/test.txt", O_WRONLY | O_CREAT | O_TRUNC);
-    while(::recv(sockfd, c, BUFFER_SIZE, 0)) {
-        qDebug() << "Writing...";
-        write(fd, c, BUFFER_SIZE);
+    int fd = open("./transfers/closer.mp3", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    int nob;
+    while((nob = ::recv(sockfd, c, BUFFER_SIZE, 0)) > 0) {
+        qDebug() << "Writing..." << nob;
+        write(fd, c, nob);
+        if(nob < 2048)
+            break;
     }
     ::close(fd);
     qDebug() << "File received!";
