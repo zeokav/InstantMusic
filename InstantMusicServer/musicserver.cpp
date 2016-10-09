@@ -29,14 +29,22 @@ int main(int argc, char *argv[]) {
         newsockfd = accept(sockfd, (struct sockaddr *)&client, &clen);
         pid_t pid = fork();
         if(pid == 0) {
-            printf("\nClient connection opened. Transferring.");
-            int fd = open("./MusicProvider/test.txt", O_RDONLY);
+            printf("\nClient connection opened. Transferring.\n");
+            int fd = open("./MusicProvider/closer.mp3", O_RDONLY);
             char buff[BUFFER_SIZE + 1];
-            while(read(fd, buff, BUFFER_SIZE)) {
-              printf("Sending...\n");
-              send(sockfd, buff, strlen(buff), 0);
-            };
-            close(fd);
+            if(fd == -1) {
+              printf("Shit no");
+            }
+            else {
+              int nob;
+              while((nob = read(fd, buff, BUFFER_SIZE)) > 0) {
+                printf("Bytes: %d\n", nob);
+                printf("Sending...\n");
+                send(newsockfd, buff, nob, 0);
+              };
+              printf("Done.\n");
+              close(fd);
+            }
             close(newsockfd);
             exit(1);
         }
