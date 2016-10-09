@@ -8,6 +8,30 @@
 
 #define BUFFER_SIZE 2048
 
+void handle_client(int newsockfd) {
+  int fd = open("./MusicProvider/closer.mp3", O_RDONLY);
+  char buff[BUFFER_SIZE + 1];
+
+  if(fd == -1) {
+    printf("Could not open file.");
+  }
+  else {
+    //filesize can be used to update progressbar.
+    off_t filesize = lseek(fd, 0, SEEK_END);
+    printf("\nFile size: %ld, transferring...\n", filesize);
+
+    //reset file pointer
+    lseek(fd, 0, SEEK_SET);
+
+    int nob;
+    while((nob = read(fd, buff, BUFFER_SIZE)) > 0) {
+      send(newsockfd, buff, nob, 0);
+    };
+    printf("Done.\n");
+    close(fd);
+  }
+}
+
 int main(int argc, char *argv[]) {
     int sockfd;
     struct sockaddr_in server, client;
@@ -29,22 +53,7 @@ int main(int argc, char *argv[]) {
         newsockfd = accept(sockfd, (struct sockaddr *)&client, &clen);
         pid_t pid = fork();
         if(pid == 0) {
-            printf("\nClient connection opened. Transferring.\n");
-            int fd = open("./MusicProvider/closer.mp3", O_RDONLY);
-            char buff[BUFFER_SIZE + 1];
-            if(fd == -1) {
-              printf("Shit no");
-            }
-            else {
-              int nob;
-              while((nob = read(fd, buff, BUFFER_SIZE)) > 0) {
-                printf("Bytes: %d\n", nob);
-                printf("Sending...\n");
-                send(newsockfd, buff, nob, 0);
-              };
-              printf("Done.\n");
-              close(fd);
-            }
+            handle_client(newsockfd);
             close(newsockfd);
             exit(1);
         }
