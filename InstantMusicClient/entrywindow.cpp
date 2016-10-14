@@ -6,9 +6,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <QDebug>
+#include "../common.hpp"
 
-#define MAX 1000
-#define BUFFER_SIZE 2048
 
 EntryWindow::EntryWindow(QWidget *parent) :
     QMainWindow(parent),

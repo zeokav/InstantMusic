@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
-#define BUFFER_SIZE 2048
+#include "../common.hpp"
 
 void handle_client(int newsockfd) {
   int fd = open("./MusicProvider/closer.mp3", O_RDONLY);
