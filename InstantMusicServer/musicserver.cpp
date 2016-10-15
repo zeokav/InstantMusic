@@ -14,12 +14,23 @@ void handle_client(int newsockfd) {
 
   if(fd == -1) {
     printf("Could not open file.");
+    header_block head;
+    head.is_error = 1;
+
+
   }
   else {
+
+    header_block head;
+    head.is_req = 0;
+    head.is_resp = 1;
+
     //filesize can be used to update progressbar.
     off_t filesize = lseek(fd, 0, SEEK_END);
     printf("\nFile size: %ld, transferring...\n", filesize);
 
+    head.filesize = filesize;
+    
     //reset file pointer
     lseek(fd, 0, SEEK_SET);
 

@@ -31,12 +31,18 @@ void EntryWindow::button_handle()
     serv.sin_addr.s_addr = inet_addr("127.0.0.1");
     serv.sin_family = AF_INET;
     serv.sin_port = htons(1234);
-
+    //
     ::connect(sockfd, (struct sockaddr *)&serv, sizeof(serv));
     qDebug() << "Connection established";
-    char c[BUFFER_SIZE + 1];
 
-//    system("mkdir transfers");
+    // Make request
+     header_block file_head;
+
+     int head_size = ::recv(sockfd, file_head, sizeof(header_block), 0);
+    // if(file_head.)
+
+    char c[BUFFER_SIZE];
+
     int fd = open("./transfers/closer.mp3", O_WRONLY | O_CREAT | O_TRUNC, 0666);
     int nob;
     while((nob = ::recv(sockfd, c, BUFFER_SIZE, 0)) > 0) {

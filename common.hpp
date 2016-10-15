@@ -1,4 +1,5 @@
-#define BUFFER_SIZE 2048
+#define BUFFER_SIZE 4096
+#define NAME_SIZE 100
 
 struct _control {
   int command;
@@ -6,9 +7,15 @@ struct _control {
   int is_data;
 };
 
-struct _block {
-  int is_error;
-  int is_data;
+struct data_block {
+  int is_done;
+  char data[BUFFER_SIZE + 1];
+};
+
+struct header_block {
+  int is_req;
+  int is_resp;
   int error_code;
-  char data[BUFFER_SIZE];
+  long filesize;
+  char filename[NAME_SIZE];
 };
