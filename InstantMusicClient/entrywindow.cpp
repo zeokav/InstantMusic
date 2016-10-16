@@ -24,35 +24,44 @@ EntryWindow::~EntryWindow()
 
 void EntryWindow::button_handle()
 {
-    qDebug() << "Button clicked";
+
     int sockfd;
     struct sockaddr_in serv;
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    serv.sin_addr.s_addr = inet_addr("127.0.0.1");
+    serv.sin_addr.s_addr = inet_addr(ui->ip_addr->text());
     serv.sin_family = AF_INET;
-    serv.sin_port = htons(1234);
-    //
-    ::connect(sockfd, (struct sockaddr *)&serv, sizeof(serv));
-    qDebug() << "Connection established";
+    serv.sin_port = htons(ui->port_no->text());
+//    serv.sin_addr.s_addr = inet_addr("127.0.0.1");
+//    serv.sin_family = AF_INET;
+//    serv.sin_port = htons(1234);
 
-    // Make request
-     header_block file_head;
+//    ::connect(sockfd, (struct sockaddr *)&serv, sizeof(serv));
+//    qDebug() << "Connection established";
 
-     int head_size = ::recv(sockfd, file_head, sizeof(header_block), 0);
-    // if(file_head.)
+//    // Make request
+//    header_block file_head;
 
-    char c[BUFFER_SIZE];
+//    ::recv(sockfd, (header_block *)&file_head, sizeof(header_block), 0);
 
-    int fd = open("./transfers/closer.mp3", O_WRONLY | O_CREAT | O_TRUNC, 0666);
-    int nob;
-    while((nob = ::recv(sockfd, c, BUFFER_SIZE, 0)) > 0) {
-        qDebug() << "Writing..." << nob;
-        write(fd, c, nob);
-        if(nob < 2048)
-            break;
-    }
-    ::close(fd);
-    qDebug() << "File received!";
-    ::close(sockfd);
+//    ui->pushButton->hide();
+
+//    if(!file_head.error_code) {
+//        qDebug() << "Header received. File size: " << file_head.filesize;
+//        char c[BUFFER_SIZE];
+//        int fd = open("./transfers/closer.mp3", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+//        int nob;
+//        while((nob = ::recv(sockfd, c, BUFFER_SIZE, 0)) > 0) {
+//            write(fd, c, nob);
+//            if(nob < 2048)
+//                break;
+//        }
+//        ::close(fd);
+//        qDebug() << "File received!";
+//    }
+//    else {
+//         catch_error("HEADER", error_code);
+//    }
+
+//    ::close(sockfd);
 
 }

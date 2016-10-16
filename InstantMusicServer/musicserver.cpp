@@ -15,9 +15,7 @@ void handle_client(int newsockfd) {
   if(fd == -1) {
     printf("Could not open file.");
     header_block head;
-    head.is_error = 1;
-
-
+    head.error_code = 1;
   }
   else {
 
@@ -30,9 +28,11 @@ void handle_client(int newsockfd) {
     printf("\nFile size: %ld, transferring...\n", filesize);
 
     head.filesize = filesize;
-    
+
     //reset file pointer
     lseek(fd, 0, SEEK_SET);
+    head.error_code = 0;
+    send(newsockfd, (header_block *)&head, sizeof(head), 0);
 
     int nob;
     while((nob = read(fd, buff, BUFFER_SIZE)) > 0) {

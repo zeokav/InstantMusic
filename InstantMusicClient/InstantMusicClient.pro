@@ -13,8 +13,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        entrywindow.cpp
+        entrywindow.cpp \
+    connectedwindow.cpp
 
-HEADERS  += entrywindow.h
+HEADERS  += entrywindow.h \
+    connectedwindow.h
 
-FORMS    += entrywindow.ui
+FORMS    += entrywindow.ui \
+    connectedwindow.ui
