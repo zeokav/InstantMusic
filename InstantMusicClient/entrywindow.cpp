@@ -5,8 +5,10 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <QApplication>
 #include <QDebug>
 #include "../common.hpp"
+#include "connectedwindow.h"
 
 
 EntryWindow::EntryWindow(QWidget *parent) :
@@ -25,15 +27,13 @@ EntryWindow::~EntryWindow()
 void EntryWindow::button_handle()
 {
 
-    int sockfd;
-    struct sockaddr_in serv;
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    serv.sin_addr.s_addr = inet_addr(ui->ip_addr->text().toStdString().c_str());
-    serv.sin_family = AF_INET;
-    serv.sin_port = htons(ui->port_no->text().toInt());
+//    int sockfd;
+//    struct sockaddr_in serv;
+//    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+//    serv.sin_addr.s_addr = inet_addr(ui->ip_addr->text().toStdString().c_str());
+//    serv.sin_family = AF_INET;
+//    serv.sin_port = htons(ui->port_no->text().toInt());
 
-    ::connect(sockfd, (struct sockaddr *)&serv, sizeof(serv));
-    qDebug() << "Connection established";
-
-
+//    ::connect(sockfd, (struct sockaddr *)&serv, sizeof(serv));
+//    qDebug() << "Connection established";
 }
