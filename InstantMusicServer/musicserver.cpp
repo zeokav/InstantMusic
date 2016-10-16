@@ -8,39 +8,64 @@
 
 #include "../common.hpp"
 
-void handle_client(int newsockfd) {
-  int fd = open("./MusicProvider/closer.mp3", O_RDONLY);
-  char buff[BUFFER_SIZE + 1];
+void send_file(int sockfd) {
+    printf("Client wants a file...\n");
+}
 
-  if(fd == -1) {
-    printf("Could not open file.");
-    header_block head;
-    head.error_code = 1;
-  }
-  else {
+void handle_client(int cli_sockfd) {
+    printf("A client has been connected.\n");
 
-    header_block head;
-    head.is_req = 0;
-    head.is_resp = 1;
+    while(1) {
+        _control ctrl;
+        printf("Waiting for command.\n");
+        recv(cli_sockfd, (_control *)&ctrl, sizeof(ctrl), 0);
+        if(ctrl.is_error) {
+            printf("Error on client side.\n");
+            break;
+        }
+        else {
+            switch(ctrl.command) {
+                case -1: 
+                    printf("Closing client connection.\n");
+                    return;
+                case 1: send_file(cli_sockfd);
+            }
+        }
+    }
+    
 
-    //filesize can be used to update progressbar.
-    off_t filesize = lseek(fd, 0, SEEK_END);
-    printf("\nFile size: %ld, transferring...\n", filesize);
+  // int fd = open("./MusicProvider/closer.mp3", O_RDONLY);
+  // char buff[BUFFER_SIZE + 1];
 
-    head.filesize = filesize;
+  // if(fd == -1) {
+  //   printf("Could not open file.");
+  //   header_block head;
+  //   head.error_code = 1;
+  // }
+  // else {
 
-    //reset file pointer
-    lseek(fd, 0, SEEK_SET);
-    head.error_code = 0;
-    send(newsockfd, (header_block *)&head, sizeof(head), 0);
+  //   header_block head;
+  //   head.is_req = 0;
+  //   head.is_resp = 1;
 
-    int nob;
-    while((nob = read(fd, buff, BUFFER_SIZE)) > 0) {
-      send(newsockfd, buff, nob, 0);
-    };
-    printf("Done.\n");
-    close(fd);
-  }
+  //   //filesize can be used to update progressbar.
+  //   off_t filesize = lseek(fd, 0, SEEK_END);
+  //   printf("\nFile size: %ld, transferring...\n", filesize);
+
+  //   head.filesize = filesize;
+
+  //   //reset file pointer
+  //   lseek(fd, 0, SEEK_SET);
+  //   head.error_code = 0;
+  //   send(newsockfd, (header_block *)&head, sizeof(head), 0);
+
+  //   int nob;
+  //   while((nob = read(fd, buff, BUFFER_SIZE)) > 0) {
+  //     send(newsockfd, buff, nob, 0);
+  //   };
+  //   printf("Done.\n");
+  //   close(fd);
+  // }
 }
 
 int main(int argc, char *argv[]) {

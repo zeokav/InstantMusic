@@ -28,15 +28,14 @@ void EntryWindow::button_handle()
     int sockfd;
     struct sockaddr_in serv;
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    serv.sin_addr.s_addr = inet_addr(ui->ip_addr->text());
+    serv.sin_addr.s_addr = inet_addr(ui->ip_addr->text().toStdString().c_str());
     serv.sin_family = AF_INET;
-    serv.sin_port = htons(ui->port_no->text());
-//    serv.sin_addr.s_addr = inet_addr("127.0.0.1");
-//    serv.sin_family = AF_INET;
-//    serv.sin_port = htons(1234);
+    serv.sin_port = htons(ui->port_no->text().toInt());
 
-//    ::connect(sockfd, (struct sockaddr *)&serv, sizeof(serv));
-//    qDebug() << "Connection established";
+    ::connect(sockfd, (struct sockaddr *)&serv, sizeof(serv));
+    qDebug() << "Connection established";
+
+
 
 //    // Make request
 //    header_block file_head;
@@ -62,6 +61,5 @@ void EntryWindow::button_handle()
 //         catch_error("HEADER", error_code);
 //    }
 
-//    ::close(sockfd);
-
+    ::close(sockfd);
 }

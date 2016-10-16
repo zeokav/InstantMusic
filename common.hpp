@@ -4,7 +4,6 @@
 struct _control {
   int command;
   int is_error;
-  int is_data;
 };
 
 struct data_block {
