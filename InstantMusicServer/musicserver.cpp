@@ -5,36 +5,14 @@
 #include <string.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include <iostream>
 
 #include "../common.hpp"
+#define PORT 1234
 
 void send_file(int sockfd) {
     printf("Client wants a file...\n");
-}
-
-void handle_client(int cli_sockfd) {
-    printf("A client has been connected.\n");
-
-    while(1) {
-        _control ctrl;
-        printf("Waiting for command.\n");
-        recv(cli_sockfd, (_control *)&ctrl, sizeof(ctrl), 0);
-        if(ctrl.is_error) {
-            printf("Error on client side.\n");
-            break;
-        }
-        else {
-            switch(ctrl.command) {
-                case -1: 
-                    printf("Closing client connection.\n");
-                    return;
-                case 1: send_file(cli_sockfd);
-            }
-        }
-    }
-    
-
-  // int fd = open("./MusicProvider/closer.mp3", O_RDONLY);
+    // int fd = open("./MusicProvider/closer.mp3", O_RDONLY);
   // char buff[BUFFER_SIZE + 1];
 
   // if(fd == -1) {
@@ -68,15 +46,48 @@ void handle_client(int cli_sockfd) {
   // }
 }
 
+void handle_client(int cli_sockfd) {
+    std::cout << "A client has been connected." << std::endl;
+
+    while(1) {
+        _control ctrl;
+        std::cout << "Waiting for command" << std::endl;
+        int bytes = recv(cli_sockfd, (_control *)&ctrl, sizeof(ctrl), 0);
+        if(bytes > 0) {
+
+            printf("Read: %d\n", bytes);
+
+            if(ctrl.is_error) {
+                printf("Error on client side.\n");
+                break;
+            }
+            else {
+                switch(ctrl.command) {
+                    case -1: 
+                        std::cout << "Closing client connection.";
+                        return;
+                    case 1: send_file(cli_sockfd);
+                }
+            }    
+        }
+        else {
+            std::cerr << "Connection dropped by client" << std::endl;
+            exit(-1);
+        }
+
+    }
+}
+
 int main(int argc, char *argv[]) {
     int sockfd;
     struct sockaddr_in server, client;
     sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
     server.sin_family = AF_INET;
-    server.sin_port = htons(1234);
+    server.sin_port = htons(PORT);
     server.sin_addr.s_addr = INADDR_ANY;
 
-    printf("Binding server...");
+    fflush(stdout);
+    std::cout << "Binding server..." << std::endl;
 
     bind(sockfd, (struct sockaddr *)&server, sizeof(server));
 
@@ -84,8 +95,9 @@ int main(int argc, char *argv[]) {
     socklen_t clen = sizeof(client);
     int newsockfd;
 
+    std::cout << "Server is up. Port number: "<< PORT << std::endl;
+
     while(1) {
-        printf("Waiting for client.");
         newsockfd = accept(sockfd, (struct sockaddr *)&client, &clen);
         pid_t pid = fork();
         if(pid == 0) {

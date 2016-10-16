@@ -15,8 +15,12 @@ public:
     explicit ConnectedWindow(QWidget *parent = 0);
     ~ConnectedWindow();
 
+private slots:
+    void fetch_music();
+
 private:
     Ui::ConnectedWindow *ui;
+
 };
 
 #endif // CONNECTEDWINDOW_H
