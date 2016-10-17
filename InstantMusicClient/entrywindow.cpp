@@ -8,7 +8,6 @@
 #include <QApplication>
 #include <QDebug>
 #include "../common.hpp"
-#include "connectedwindow.h"
 
 
 EntryWindow::EntryWindow(QWidget *parent) :
@@ -17,6 +16,7 @@ EntryWindow::EntryWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(button_handle()));
+    ui->statusBar->showMessage("Waiting for server input.");
 }
 
 EntryWindow::~EntryWindow()
@@ -26,14 +26,25 @@ EntryWindow::~EntryWindow()
 
 void EntryWindow::button_handle()
 {
+    ui->statusBar->showMessage("Establishing connection...");
+    int sockfd;
+    struct sockaddr_in serv;
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    serv.sin_addr.s_addr = inet_addr(ui->ip_addr->text().toStdString().c_str());
+    serv.sin_family = AF_INET;
+    serv.sin_port = htons(ui->port_no->text().toInt());
+    int is_connected = ::connect(sockfd, (struct sockaddr *)&serv, sizeof(serv));
+    if(is_connected != -1) {
+        ui->statusBar->showMessage("Connection established!");
 
-//    int sockfd;
-//    struct sockaddr_in serv;
-//    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-//    serv.sin_addr.s_addr = inet_addr(ui->ip_addr->text().toStdString().c_str());
-//    serv.sin_family = AF_INET;
-//    serv.sin_port = htons(ui->port_no->text().toInt());
+        //If connection happens, open client window.
+        popUpWindow = new ConnectedWindow();
+        popUpWindow->show();
 
-//    ::connect(sockfd, (struct sockaddr *)&serv, sizeof(serv));
-//    qDebug() << "Connection established";
+        //Close the current window.
+        this->close();
+    }
+    else {
+        ui->statusBar->showMessage("Connection failed. Check input!");
+    }
 }
