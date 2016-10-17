@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QDebug>
+#include "connectedwindow.h"
 
 class ServerInfo {
     void test() {
@@ -34,6 +35,7 @@ private slots:
 private:
     Ui::EntryWindow *ui;
     QPushButton *p_btn;
+    ConnectedWindow *popUpWindow;
 
 };
 
