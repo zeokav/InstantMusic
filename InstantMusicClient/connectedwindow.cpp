@@ -1,11 +1,18 @@
 #include "connectedwindow.h"
 #include "ui_connectedwindow.h"
+#include "entrywindow.h"
 
-ConnectedWindow::ConnectedWindow(QWidget *parent) :
+ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ConnectedWindow)
 {
+    s_info = serv;
     ui->setupUi(this);
+    char address[100];
+    strcpy(address, "Connected to address: ");
+    strcat(address, inet_ntoa(s_info.serv.sin_addr));
+    ui->label->setText(address);
+    connect(ui->actionDisconnect, SIGNAL(triggered(bool)), this, SLOT(kill_client()));
 }
 
 ConnectedWindow::~ConnectedWindow()
@@ -15,6 +22,7 @@ ConnectedWindow::~ConnectedWindow()
 
 void ConnectedWindow::fetch_music()
 {
+
     //    // Make request
     //    header_block file_head;
 
@@ -38,4 +46,12 @@ void ConnectedWindow::fetch_music()
     //    else {
     //         catch_error("HEADER", error_code);
     //    }
+}
+
+void ConnectedWindow::kill_client()
+{
+    EntryWindow *ew = new EntryWindow();
+    ew->show();
+    ew->setWindowTitle("InstantMusic Client");
+    this->close();
 }

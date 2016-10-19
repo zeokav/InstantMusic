@@ -6,17 +6,6 @@
 #include <QDebug>
 #include "connectedwindow.h"
 
-class ServerInfo {
-    void test() {
-        qDebug() << "Test working";
-    }
-
-public:
-    ServerInfo() {
-
-    }
-};
-
 namespace Ui {
     class EntryWindow;
 }

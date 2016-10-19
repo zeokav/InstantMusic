@@ -1,3 +1,10 @@
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <netdb.h>
+
 #define BUFFER_SIZE 4096
 #define NAME_SIZE 100
 
@@ -17,4 +24,9 @@ struct header_block {
   int error_code;
   long filesize;
   char filename[NAME_SIZE];
+};
+
+struct server_info {
+  int sockfd;
+  sockaddr_in serv;
 };

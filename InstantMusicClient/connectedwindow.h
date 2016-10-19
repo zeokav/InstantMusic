@@ -2,6 +2,7 @@
 #define CONNECTEDWINDOW_H
 
 #include <QMainWindow>
+#include "../common.hpp"
 
 namespace Ui {
 class ConnectedWindow;
@@ -12,14 +13,16 @@ class ConnectedWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit ConnectedWindow(QWidget *parent = 0);
+    explicit ConnectedWindow(server_info serv, QWidget *parent = 0);
     ~ConnectedWindow();
 
 private slots:
     void fetch_music();
+    void kill_client();
 
 private:
     Ui::ConnectedWindow *ui;
+    server_info s_info;
 
 };
 
