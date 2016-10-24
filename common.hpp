@@ -7,6 +7,7 @@
 
 #define BUFFER_SIZE 4096
 #define NAME_SIZE 100
+#define PATH_SIZE 128
 
 struct _control {
   int command;

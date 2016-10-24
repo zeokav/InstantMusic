@@ -1,10 +1,7 @@
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <netinet/in.h>
 #include <string.h>
 #include <sys/types.h>
-#include <fcntl.h>
 #include <iostream>
 
 #include "../common.hpp"
@@ -12,6 +9,12 @@
 
 void send_file(int sockfd) {
     printf("Client wants a file...\n");
+    header_block req_header;
+    int bytes = recv(sockfd, (header_block *)&req_header, sizeof(header_block), 0);
+    if(bytes > 0) {
+        char path[PATH_SIZE] = "./MusicProvider/";
+        strcat(path, req_header.filename);
+    }
     // int fd = open("./MusicProvider/closer.mp3", O_RDONLY);
   // char buff[BUFFER_SIZE + 1];
 
