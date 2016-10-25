@@ -2,6 +2,9 @@
 #define CONNECTEDWINDOW_H
 
 #include <QMainWindow>
+#include <QFile>
+#include <QMessageBox>
+#include <QStringListModel>
 #include "../common.hpp"
 
 namespace Ui {
@@ -18,6 +21,7 @@ public:
 
 private slots:
     void fetch_music();
+    void list_music();
     void kill_client();
 
 private:
