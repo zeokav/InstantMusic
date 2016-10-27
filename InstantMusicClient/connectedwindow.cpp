@@ -89,11 +89,14 @@ void ConnectedWindow::list_music()
             stringList.append(line); // populate the stringlist
     }
 
-    // create song model and populate it with stringList
+    // Create song model and populate it with stringList
     QStringListModel *model;
     model = new QStringListModel(this);
     model->setStringList(stringList);
     ui->listView->setModel(model);
+
+    // Remove the temporary pipe from the system.
+    system("rm SongList.txt");
 }
 
 void ConnectedWindow::kill_client()
