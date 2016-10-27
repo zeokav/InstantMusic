@@ -49,6 +49,22 @@ void send_file(int sockfd) {
   // }
 }
 
+void send_listing(int sockfd) {
+    printf("Sending listing\n");
+    system("ls ./MusicProvider/ > listing.txt");
+    int fd = open("./listing.txt", O_RDONLY);
+    if(fd == -1) {
+        printf("Error fetching the songlist\n");
+        return;
+    }
+    char buff[BUFFER_SIZE + 1];
+    int nob;
+    while((nob = read(fd, buff, BUFFER_SIZE)) > 0) {
+        send(sockfd, buff, nob, 0);
+    }
+}
+
+
 void handle_client(int cli_sockfd) {
     std::cout << "A client has been connected." << std::endl;
 
@@ -57,9 +73,6 @@ void handle_client(int cli_sockfd) {
         std::cout << "Waiting for command" << std::endl;
         int bytes = recv(cli_sockfd, (_control *)&ctrl, sizeof(ctrl), 0);
         if(bytes > 0) {
-
-            printf("Read: %d\n", bytes);
-
             if(ctrl.is_error) {
                 printf("Error on client side.\n");
                 break;
@@ -69,7 +82,10 @@ void handle_client(int cli_sockfd) {
                     case -1: 
                         std::cout << "Closing client connection.";
                         return;
-                    case 1: send_file(cli_sockfd);
+                    case REQ_FILE: send_file(cli_sockfd);
+                        break;
+                    case REQ_LIST: send_listing(cli_sockfd);
+                        break;
                 }
             }    
         }

@@ -1,3 +1,6 @@
+#ifndef COMMON_HPP
+#define COMMON_HPP
+
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
@@ -8,6 +11,8 @@
 #define BUFFER_SIZE 4096
 #define NAME_SIZE 100
 #define PATH_SIZE 128
+#define REQ_FILE 1
+#define REQ_LIST 2
 
 struct _control {
   int command;
@@ -31,3 +36,5 @@ struct server_info {
   int sockfd;
   sockaddr_in serv;
 };
+
+#endif

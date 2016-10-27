@@ -51,15 +51,33 @@ void ConnectedWindow::fetch_music()
 
 void ConnectedWindow::list_music()
 {
-    QStringList stringList;
+    _control ctrl;
+    ctrl.command = REQ_LIST;
+    ctrl.is_error = 0;
+    send(s_info.sockfd, (_control *)&ctrl, sizeof(_control), 0);
+    char list_data[BUFFER_SIZE];
+    int fd = open("SongList.txt", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    int nob;
+    while((nob = ::recv(s_info.sockfd, list_data, BUFFER_SIZE, 0)) > 0) {
+        write(fd, list_data, nob);
+        if(nob!=BUFFER_SIZE)
+            break;
+    }
 
+    QString status = "Received: ";
+    status.append(QString::number(nob));
+
+    ui->statusbar->showMessage(status);
+    ::close(fd);
+
+    QStringList stringList;
     // Assuming listing is in a file, can be modified as needed
     // Cannot find file path
 
-    QFile listing("../SongList.txt");
+    QFile listing("SongList.txt");
     if(!listing.open(QIODevice::ReadOnly))
     {
-        QMessageBox::information(0,"Error",listing.errorString());
+        QMessageBox::information(0, "Error", listing.errorString());
     }
     QTextStream textStream(&listing);
     while (true)

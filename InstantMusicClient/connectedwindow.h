@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QMessageBox>
 #include <QStringListModel>
+#include <QString>
 #include "../common.hpp"
 
 namespace Ui {
