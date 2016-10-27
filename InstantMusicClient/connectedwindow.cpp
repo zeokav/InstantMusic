@@ -94,6 +94,7 @@ void ConnectedWindow::list_music()
     model = new QStringListModel(this);
     model->setStringList(stringList);
     ui->listView->setModel(model);
+    ui->listView->setEditTriggers(QAbstractItemView.NoEditTriggers);
 
     // Remove the temporary pipe from the system.
     system("rm SongList.txt");

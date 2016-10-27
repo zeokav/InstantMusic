@@ -1,2 +1,2 @@
-build*/
-InstantMusicServer/*.out
+/build*
+/InstantMusicServer/*.out
