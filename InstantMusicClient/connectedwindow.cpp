@@ -13,6 +13,8 @@ ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
     strcat(address, inet_ntoa(s_info.serv.sin_addr));
     ui->label->setText(address);
     connect(ui->actionDisconnect, SIGNAL(triggered(bool)), this, SLOT(kill_client()));
+    connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(list_music()));
+    connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fetch_music()));
     list_music();
 }
 
@@ -23,7 +25,12 @@ ConnectedWindow::~ConnectedWindow()
 
 void ConnectedWindow::fetch_music()
 {
-
+    qDebug() << "A song was double clicked";
+    QObject *s = sender();
+    QObjectList item = s->children();
+    for(int i = 0; i<item.size(); i++) {
+        qDebug() << item[i]->objectName();
+    }
 //        // Make request
 //        header_block file_head;
 
@@ -94,7 +101,7 @@ void ConnectedWindow::list_music()
     model = new QStringListModel(this);
     model->setStringList(stringList);
     ui->listView->setModel(model);
-    ui->listView->setEditTriggers(QAbstractItemView.NoEditTriggers);
+    ui->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     // Remove the temporary pipe from the system.
     system("rm SongList.txt");
