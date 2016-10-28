@@ -14,6 +14,8 @@ ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
     strcpy(address, "Connected to address: ");
     strcat(address, inet_ntoa(s_info.serv.sin_addr));
     ui->label->setText(address);
+
+    // Actions
     connect(ui->actionDisconnect, SIGNAL(triggered(bool)), this, SLOT(kill_client()));
     connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(list_music()));
     connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fetch_music(QModelIndex)));
@@ -58,6 +60,7 @@ void ConnectedWindow::stop_music()
     }
     if(player) {
         is_destroyed = true;
+        ui->label_3->setText("");
         delete player;
         is_playing = false;
         ui->pauseButton->setText("Pause");
@@ -74,6 +77,12 @@ void ConnectedWindow::setup_music_player(QString song_name)
     player->setVolume(50);
     player->play();
     is_playing = true;
+    is_destroyed = false;
+
+    QString label_text = "Currently playing: ";
+    label_text.append(song_name);
+
+    ui->label_3->setText(label_text);
     ui->progressBar->hide();
 }
 
@@ -198,6 +207,7 @@ void ConnectedWindow::list_music()
 
 void ConnectedWindow::kill_client()
 {
+    ::close(s_info.sockfd);
     EntryWindow *ew = new EntryWindow();
     ew->show();
     ew->setWindowTitle("InstantMusic Client");
