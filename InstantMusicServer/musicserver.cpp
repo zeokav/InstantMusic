@@ -9,44 +9,48 @@
 
 void send_file(int sockfd) {
     printf("Client wants a file...\n");
-    header_block req_header;
-    int bytes = recv(sockfd, (header_block *)&req_header, sizeof(header_block), 0);
+
+    char s_name[NAME_SIZE];
+    int bytes = recv(sockfd, s_name, NAME_SIZE, 0);
     if(bytes > 0) {
+        printf("Client wants file: %s", s_name);
         char path[PATH_SIZE] = "./MusicProvider/";
-        strcat(path, req_header.filename);
+        strcat(path, s_name);  
     }
-    // int fd = open("./MusicProvider/closer.mp3", O_RDONLY);
-  // char buff[BUFFER_SIZE + 1];
 
-  // if(fd == -1) {
-  //   printf("Could not open file.");
-  //   header_block head;
-  //   head.error_code = 1;
-  // }
-  // else {
+    
+    int fd = open("./MusicProvider/closer.mp3", O_RDONLY);
+    char buff[BUFFER_SIZE + 1];
 
-  //   header_block head;
-  //   head.is_req = 0;
-  //   head.is_resp = 1;
+    if(fd == -1) {
+        printf("Could not open file.");
+        header_block head;
+        head.error_code = 1;
+    }
+    else {
 
-  //   //filesize can be used to update progressbar.
-  //   off_t filesize = lseek(fd, 0, SEEK_END);
-  //   printf("\nFile size: %ld, transferring...\n", filesize);
+        header_block head;
+        head.is_req = 0;
+        head.is_resp = 1;
 
-  //   head.filesize = filesize;
+        //filesize can be used to update progressbar.
+        off_t filesize = lseek(fd, 0, SEEK_END);
+        printf("\nFile size: %ld, transferring...\n", filesize);
 
-  //   //reset file pointer
-  //   lseek(fd, 0, SEEK_SET);
-  //   head.error_code = 0;
-  //   send(newsockfd, (header_block *)&head, sizeof(head), 0);
+        head.filesize = filesize;
 
-  //   int nob;
-  //   while((nob = read(fd, buff, BUFFER_SIZE)) > 0) {
-  //     send(newsockfd, buff, nob, 0);
-  //   };
-  //   printf("Done.\n");
-  //   close(fd);
-  // }
+        //reset file pointer
+        lseek(fd, 0, SEEK_SET);
+        head.error_code = 0;
+        send(sockfd, (header_block *)&head, sizeof(head), 0);
+
+        int nob;
+        while((nob = read(fd, buff, BUFFER_SIZE)) > 0) {
+          send(sockfd, buff, nob, 0);
+        };
+        printf("Done.\n");
+        close(fd);
+    }
 }
 
 void send_listing(int sockfd) {

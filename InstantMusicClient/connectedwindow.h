@@ -23,14 +23,15 @@ public:
     ~ConnectedWindow();
 
 private slots:
-    void fetch_music();
+    void fetch_music(QModelIndex);
     void list_music();
     void kill_client();
-    void setup_music_player();
 
 private:
     Ui::ConnectedWindow *ui;
     server_info s_info;
+    void setup_music_player(QString);
+    int download_song(QString);
 
 };
 

@@ -29,7 +29,7 @@ struct header_block {
   int is_resp;
   int error_code;
   long filesize;
-  char filename[NAME_SIZE];
+  const char *filename;
 };
 
 struct server_info {

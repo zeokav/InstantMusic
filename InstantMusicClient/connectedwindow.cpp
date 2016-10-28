@@ -14,9 +14,8 @@ ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
     ui->label->setText(address);
     connect(ui->actionDisconnect, SIGNAL(triggered(bool)), this, SLOT(kill_client()));
     connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(list_music()));
-    connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fetch_music()));
+    connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fetch_music(QModelIndex)));
     list_music();
-    setup_music_player();
 }
 
 ConnectedWindow::~ConnectedWindow()
@@ -24,46 +23,68 @@ ConnectedWindow::~ConnectedWindow()
     delete ui;
 }
 
-void ConnectedWindow::setup_music_player()
+void ConnectedWindow::setup_music_player(QString song_name)
 {
     QMediaPlayer *player = new QMediaPlayer;
-    QString mediaPath = qApp->applicationDirPath().mid(0, 107).append("/closer.mp3");
+    QString mediaPath = qApp->applicationDirPath().append("/");
+    mediaPath.append(song_name);
     player->setMedia(QUrl::fromLocalFile(mediaPath));
     player->setVolume(50);
     player->play();
 }
 
-void ConnectedWindow::fetch_music()
+int ConnectedWindow::download_song(QString song_name)
 {
-    qDebug() << "A song was double clicked";
-    QObject *s = sender();
-    QObjectList item = s->children();
-    for(int i = 0; i<item.size(); i++) {
-        qDebug() << item[i]->objectName();
+    // Make request
+    char file_name[NAME_SIZE];
+    int i;
+    for(i = 0; i<song_name.size(); i++) {
+        file_name[i] = song_name.at(i).toLatin1();
     }
-//        // Make request
-//        header_block file_head;
+    file_name[i] = '\0';
 
-//        ::recv(sockfd, (header_block *)&file_head, sizeof(header_block), 0);
+    qDebug() << file_name;
 
-//        ui->pushButton->hide();
+    header_block file_head;
 
-//        if(!file_head.error_code) {
-//            qDebug() << "Header received. File size: " << file_head.filesize;
-//            char c[BUFFER_SIZE];
-//            int fd = open("./transfers/closer.mp3", O_WRONLY | O_CREAT | O_TRUNC, 0666);
-//            int nob;
-//            while((nob = ::recv(sockfd, c, BUFFER_SIZE, 0)) > 0) {
-//                write(fd, c, nob);
-//                if(nob < 2048)
-//                    break;
-//            }
-//            ::close(fd);
-//            qDebug() << "File received!";
-//        }
-//        else {
-//             catch_error("HEADER", error_code);
-//        }
+    send(s_info.sockfd, file_name, NAME_SIZE, 0);
+    ::recv(s_info.sockfd, (header_block *)&file_head, sizeof(header_block), 0);
+
+    if(!file_head.error_code) {
+        qDebug() << "Header received. File size: " << file_head.filesize;
+        char c[BUFFER_SIZE];
+        system("mkdir transfers");
+        QString path = "./transfers/";
+        path.append(song_name);
+        int fd = open(path.toStdString().c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
+        int nob;
+        while((nob = ::recv(s_info.sockfd, c, BUFFER_SIZE, 0)) > 0) {
+            write(fd, c, nob);
+            if(nob < 2048)
+                break;
+        }
+        ::close(fd);
+        qDebug() << "File received!";
+    }
+    else {
+        qDebug() << "Error";
+    }
+}
+
+void ConnectedWindow::fetch_music(QModelIndex index)
+{
+    QString song_name = index.data().toString();
+    QString message(song_name);
+    message.prepend("Selected: ");
+    ui->statusbar->showMessage(message);
+
+    _control ctrl;
+    ctrl.command = REQ_FILE;
+    ctrl.is_error = 0;
+    send(s_info.sockfd, (_control *)&ctrl, sizeof(_control), 0);
+    download_song(song_name);
+//    setup_music_player(song_name);
+
 }
 
 void ConnectedWindow::list_music()
