@@ -16,11 +16,21 @@ ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
     connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(list_music()));
     connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fetch_music()));
     list_music();
+    setup_music_player();
 }
 
 ConnectedWindow::~ConnectedWindow()
 {
     delete ui;
+}
+
+void ConnectedWindow::setup_music_player()
+{
+    QMediaPlayer *player = new QMediaPlayer;
+    QString mediaPath = qApp->applicationDirPath().mid(0, 107).append("/closer.mp3");
+    player->setMedia(QUrl::fromLocalFile(mediaPath));
+    player->setVolume(50);
+    player->play();
 }
 
 void ConnectedWindow::fetch_music()
