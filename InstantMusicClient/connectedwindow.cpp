@@ -15,6 +15,7 @@ ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
     connect(ui->actionDisconnect, SIGNAL(triggered(bool)), this, SLOT(kill_client()));
     connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(list_music()));
     connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fetch_music(QModelIndex)));
+    ui->progressBar->hide();
     list_music();
 }
 
@@ -26,7 +27,7 @@ ConnectedWindow::~ConnectedWindow()
 void ConnectedWindow::setup_music_player(QString song_name)
 {
     QMediaPlayer *player = new QMediaPlayer;
-    QString mediaPath = qApp->applicationDirPath().append("/");
+    QString mediaPath = qApp->applicationDirPath().append("/transfers/");
     mediaPath.append(song_name);
     player->setMedia(QUrl::fromLocalFile(mediaPath));
     player->setVolume(50);
@@ -51,6 +52,8 @@ int ConnectedWindow::download_song(QString song_name)
     ::recv(s_info.sockfd, (header_block *)&file_head, sizeof(header_block), 0);
 
     if(!file_head.error_code) {
+        ui->progressBar->show();
+        ui->progressBar->setValue(0);
         qDebug() << "Header received. File size: " << file_head.filesize;
         char c[BUFFER_SIZE];
         system("mkdir transfers");
@@ -58,16 +61,23 @@ int ConnectedWindow::download_song(QString song_name)
         path.append(song_name);
         int fd = open(path.toStdString().c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
         int nob;
+        int received = 0;
+        int percentage;
         while((nob = ::recv(s_info.sockfd, c, BUFFER_SIZE, 0)) > 0) {
             write(fd, c, nob);
+            received += nob;
+            percentage = (received/file_head.filesize)*100;
+            ui->progressBar->setValue(percentage);
             if(nob < 2048)
                 break;
         }
         ::close(fd);
         qDebug() << "File received!";
+        return 1;
     }
     else {
         qDebug() << "Error";
+        return -1;
     }
 }
 
@@ -82,8 +92,13 @@ void ConnectedWindow::fetch_music(QModelIndex index)
     ctrl.command = REQ_FILE;
     ctrl.is_error = 0;
     send(s_info.sockfd, (_control *)&ctrl, sizeof(_control), 0);
-    download_song(song_name);
-//    setup_music_player(song_name);
+    int is_downloaded = download_song(song_name);
+    if(is_downloaded == -1) {
+        QMessageBox::information(0, "Error", "Could not open file!");
+    }
+    else {
+        setup_music_player(song_name);
+    }
 
 }
 
