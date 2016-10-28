@@ -6,6 +6,8 @@ ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ConnectedWindow)
 {
+    is_playing = false;
+    is_destroyed = true;
     s_info = serv;
     ui->setupUi(this);
     char address[100];
@@ -16,6 +18,8 @@ ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
     connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(list_music()));
     connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fetch_music(QModelIndex)));
     connect(ui->pauseButton, SIGNAL(clicked(bool)), this, SLOT(change_state()));
+    connect(ui->stopButton, SIGNAL(clicked(bool)), this, SLOT(stop_music()));
+
     ui->progressBar->hide();
     ui->playProgress->setValue(0);
     list_music();
@@ -32,15 +36,33 @@ void ConnectedWindow::change_state()
         player->pause();
         is_playing = false;
         ui->pauseButton->setText("Resume");
+        ui->statusbar->showMessage("Paused...");
     }
     else {
-        if(player) {
+        if(is_destroyed) {
+            ui->statusbar->showMessage("Music was either stopped or not selected!");
+        }
+        else if(player) {
             player->play();
             is_playing = true;
             ui->pauseButton->setText("Pause");
+            ui->statusbar->showMessage("Playing...");
         }
     }
+}
 
+void ConnectedWindow::stop_music()
+{
+    if(is_destroyed) {
+        return;
+    }
+    if(player) {
+        is_destroyed = true;
+        delete player;
+        is_playing = false;
+        ui->pauseButton->setText("Pause");
+        ui->statusbar->showMessage("Stopped music.");
+    }
 }
 
 void ConnectedWindow::setup_music_player(QString song_name)

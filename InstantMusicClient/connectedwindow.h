@@ -27,13 +27,15 @@ private slots:
     void list_music();
     void kill_client();
     void change_state();
+    void stop_music();
 
 private:
     Ui::ConnectedWindow *ui;
     server_info s_info;
     void setup_music_player(QString);
     int download_song(QString);
-    bool is_playing = false;
+    bool is_playing;
+    bool is_destroyed;
     QMediaPlayer *player;
 
 };
