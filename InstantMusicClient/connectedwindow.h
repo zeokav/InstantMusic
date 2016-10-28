@@ -6,6 +6,8 @@
 #include <QMessageBox>
 #include <QStringListModel>
 #include <QString>
+#include <QDir>
+#include <QtMultimedia/QMediaPlayer>
 #include "../common.hpp"
 
 namespace Ui {
@@ -24,6 +26,7 @@ private slots:
     void fetch_music();
     void list_music();
     void kill_client();
+    void setup_music_player();
 
 private:
     Ui::ConnectedWindow *ui;
