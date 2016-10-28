@@ -27,7 +27,8 @@ ConnectedWindow::~ConnectedWindow()
 void ConnectedWindow::setup_music_player()
 {
     QMediaPlayer *player = new QMediaPlayer;
-    player->setMedia(QUrl::fromLocalFile("../InstantMusicServer/MusicProvider/closer.mp3"));
+    QString mediaPath = qApp->applicationDirPath().mid(0, 107).append("/closer.mp3");
+    player->setMedia(QUrl::fromLocalFile(mediaPath));
     player->setVolume(50);
     player->play();
 }

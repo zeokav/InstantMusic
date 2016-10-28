@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QStringListModel>
 #include <QString>
+#include <QDir>
 #include <QtMultimedia/QMediaPlayer>
 #include "../common.hpp"
 
