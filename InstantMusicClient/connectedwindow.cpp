@@ -15,7 +15,9 @@ ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
     connect(ui->actionDisconnect, SIGNAL(triggered(bool)), this, SLOT(kill_client()));
     connect(ui->pushButton, SIGNAL(clicked(bool)), this, SLOT(list_music()));
     connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fetch_music(QModelIndex)));
+    connect(ui->pauseButton, SIGNAL(clicked(bool)), this, SLOT(change_state()));
     ui->progressBar->hide();
+    ui->playProgress->setValue(0);
     list_music();
 }
 
@@ -24,14 +26,33 @@ ConnectedWindow::~ConnectedWindow()
     delete ui;
 }
 
+void ConnectedWindow::change_state()
+{
+    if(is_playing) {
+        player->pause();
+        is_playing = false;
+        ui->pauseButton->setText("Resume");
+    }
+    else {
+        if(player) {
+            player->play();
+            is_playing = true;
+            ui->pauseButton->setText("Pause");
+        }
+    }
+
+}
+
 void ConnectedWindow::setup_music_player(QString song_name)
 {
-    QMediaPlayer *player = new QMediaPlayer;
+    player = new QMediaPlayer;
     QString mediaPath = qApp->applicationDirPath().append("/transfers/");
     mediaPath.append(song_name);
     player->setMedia(QUrl::fromLocalFile(mediaPath));
     player->setVolume(50);
     player->play();
+    is_playing = true;
+    ui->progressBar->hide();
 }
 
 int ConnectedWindow::download_song(QString song_name)
@@ -68,7 +89,7 @@ int ConnectedWindow::download_song(QString song_name)
             received += nob;
             percentage = (received/file_head.filesize)*100;
             ui->progressBar->setValue(percentage);
-            if(nob < 2048)
+            if(nob < BUFFER_SIZE)
                 break;
         }
         ::close(fd);
@@ -113,7 +134,7 @@ void ConnectedWindow::list_music()
     int nob;
     while((nob = ::recv(s_info.sockfd, list_data, BUFFER_SIZE, 0)) > 0) {
         write(fd, list_data, nob);
-        if(nob!=BUFFER_SIZE)
+        if(nob != BUFFER_SIZE)
             break;
     }
 

@@ -5,7 +5,6 @@
 #include <iostream>
 
 #include "../common.hpp"
-#define PORT 1234
 
 void send_file(int sockfd) {
     printf("Client wants a file...\n");
@@ -102,11 +101,18 @@ void handle_client(int cli_sockfd) {
 }
 
 int main(int argc, char *argv[]) {
+
+    if(argc < 2) {
+        printf("Please specify port.\n");
+        return 1;
+    }
+    int port = atoi(argv[1]);
+
     int sockfd;
     struct sockaddr_in server, client;
     sockfd = ::socket(AF_INET, SOCK_STREAM, 0);
     server.sin_family = AF_INET;
-    server.sin_port = htons(PORT);
+    server.sin_port = htons(port);
     server.sin_addr.s_addr = INADDR_ANY;
 
     fflush(stdout);
@@ -118,7 +124,7 @@ int main(int argc, char *argv[]) {
     socklen_t clen = sizeof(client);
     int newsockfd;
 
-    std::cout << "Server is up. Port number: "<< PORT << std::endl;
+    std::cout << "Server is up. Port number: "<< port << std::endl;
 
     while(1) {
         newsockfd = accept(sockfd, (struct sockaddr *)&client, &clen);
