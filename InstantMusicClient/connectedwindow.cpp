@@ -21,6 +21,7 @@ ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
     connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fetch_music(QModelIndex)));
     connect(ui->pauseButton, SIGNAL(clicked(bool)), this, SLOT(change_state()));
     connect(ui->stopButton, SIGNAL(clicked(bool)), this, SLOT(stop_music()));
+    connect(ui->uploadButton, SIGNAL(clicked(bool)), this, SLOT(open_file_browser()));
 
     ui->progressBar->hide();
     ui->playProgress->setValue(0);
@@ -30,6 +31,13 @@ ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
 ConnectedWindow::~ConnectedWindow()
 {
     delete ui;
+}
+
+void ConnectedWindow::open_file_browser()
+{
+    QString file_name = QFileDialog::getOpenFileName(this, tr("Open File"),"~",tr("Mp3 Files (*.mp3)"));
+    qDebug() << "File selected " << file_name;
+    // fileName has entire file path, upload this to server, might have to change name
 }
 
 void ConnectedWindow::change_state()
