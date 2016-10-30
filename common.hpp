@@ -13,6 +13,7 @@
 #define PATH_SIZE 128
 #define REQ_FILE 1
 #define REQ_LIST 2
+#define FUPLOAD 3
 
 struct _control {
   int command;
