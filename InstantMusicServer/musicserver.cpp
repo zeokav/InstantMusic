@@ -11,14 +11,15 @@ void send_file(int sockfd) {
 
     char s_name[NAME_SIZE];
     int bytes = recv(sockfd, s_name, NAME_SIZE, 0);
+    char path[PATH_SIZE];
     if(bytes > 0) {
         printf("Client wants file: %s", s_name);
-        char path[PATH_SIZE] = "./MusicProvider/";
+        strcpy(path, "./MusicProvider/");
         strcat(path, s_name);  
     }
 
     
-    int fd = open("./MusicProvider/closer.mp3", O_RDONLY);
+    int fd = open(path, O_RDONLY);
     char buff[BUFFER_SIZE + 1];
 
     if(fd == -1) {
@@ -50,6 +51,35 @@ void send_file(int sockfd) {
         printf("Done.\n");
         close(fd);
     }
+}
+
+void receive_file(int sockfd) {
+    char filename[NAME_SIZE];
+    recv(sockfd, filename, NAME_SIZE, 0);
+    char path[PATH_SIZE];
+    std::cout << "File name: " << filename;
+    strcpy(path, "./MusicProvider/");
+    strcat(path, filename);
+
+    printf("%s\n", path);
+    char buff[BUFFER_SIZE + 1];
+    int fd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    
+    if(fd == -1) {
+        printf("Error making\n");
+        return;
+    }
+    int nob;
+    while((nob = recv(sockfd, buff, BUFFER_SIZE, 0)) > 0) {
+        write(fd, buff, nob);
+        if(nob < BUFFER_SIZE){
+            printf("Done\n");
+            break;
+        }
+            
+    }
+    close(fd);
+    printf("File received.\n");
 }
 
 void send_listing(int sockfd) {
@@ -88,6 +118,8 @@ void handle_client(int cli_sockfd) {
                     case REQ_FILE: send_file(cli_sockfd);
                         break;
                     case REQ_LIST: send_listing(cli_sockfd);
+                        break;
+                    case FUPLOAD: receive_file(cli_sockfd);
                         break;
                 }
             }    

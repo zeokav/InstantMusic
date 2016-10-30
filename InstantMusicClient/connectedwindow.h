@@ -7,6 +7,7 @@
 #include <QStringListModel>
 #include <QString>
 #include <QDir>
+#include <QFileDialog>
 #include <QtMultimedia/QMediaPlayer>
 #include "../common.hpp"
 
@@ -28,6 +29,7 @@ private slots:
     void kill_client();
     void change_state();
     void stop_music();
+    void open_file_browser();
 
 private:
     Ui::ConnectedWindow *ui;

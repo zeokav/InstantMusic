@@ -21,6 +21,7 @@ ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
     connect(ui->listView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(fetch_music(QModelIndex)));
     connect(ui->pauseButton, SIGNAL(clicked(bool)), this, SLOT(change_state()));
     connect(ui->stopButton, SIGNAL(clicked(bool)), this, SLOT(stop_music()));
+    connect(ui->uploadButton, SIGNAL(clicked(bool)), this, SLOT(open_file_browser()));
 
     ui->progressBar->hide();
     ui->playProgress->setValue(0);
@@ -30,6 +31,48 @@ ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
 ConnectedWindow::~ConnectedWindow()
 {
     delete ui;
+}
+
+void ConnectedWindow::open_file_browser()
+{
+    QString file_name = QFileDialog::getOpenFileName(this, tr("Open File"),"~",tr("Mp3 Files (*.mp3)"));
+    qDebug() << "File selected " << file_name;
+    // fileName has entire file path, upload this to server, might have to change name
+
+    _control ctrl;
+    ctrl.command = FUPLOAD;
+    ctrl.is_error = 0;
+    ::send(s_info.sockfd, (_control *)&ctrl, sizeof(_control), 0);
+
+    int file_name_starts_at = file_name.lastIndexOf("/");
+    QString file_name_to_send = file_name.mid(file_name_starts_at + 1);
+    qDebug() << "File name " << file_name_to_send;
+
+    int i;
+    char filename[NAME_SIZE];
+    for(i = 0; i<file_name_to_send.size(); i++) {
+        filename[i] = file_name_to_send.at(i).toLatin1();
+    }
+    filename[i] = '\0';
+
+    ::send(s_info.sockfd, filename, NAME_SIZE, 0);
+    int nob;
+    int fd = open(file_name.toStdString().c_str(), O_RDONLY);
+    if(fd != -1) {
+        char buff[BUFFER_SIZE + 1];
+        while((nob = read(fd, buff, BUFFER_SIZE)) > 0) {
+            if(nob < BUFFER_SIZE) {
+                break;
+            }
+            ::send(s_info.sockfd, buff, BUFFER_SIZE, 0);
+        }
+        char flush[10];
+        ::send(s_info.sockfd, flush, 10, 0);
+        qDebug() << "File sent";
+    }
+    else {
+        qDebug() << "LOL";
+    }
 }
 
 void ConnectedWindow::change_state()
@@ -135,6 +178,9 @@ int ConnectedWindow::download_song(QString song_name)
 
 void ConnectedWindow::fetch_music(QModelIndex index)
 {
+    if(!is_destroyed) {
+        stop_music();
+    }
     QString song_name = index.data().toString();
     QString message(song_name);
     message.prepend("Selected: ");
