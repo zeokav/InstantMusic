@@ -11,14 +11,15 @@ void send_file(int sockfd) {
 
     char s_name[NAME_SIZE];
     int bytes = recv(sockfd, s_name, NAME_SIZE, 0);
+    char path[PATH_SIZE];
     if(bytes > 0) {
         printf("Client wants file: %s", s_name);
-        char path[PATH_SIZE] = "./MusicProvider/";
+        strcpy(path, "./MusicProvider/");
         strcat(path, s_name);  
     }
 
     
-    int fd = open("./MusicProvider/closer.mp3", O_RDONLY);
+    int fd = open(path, O_RDONLY);
     char buff[BUFFER_SIZE + 1];
 
     if(fd == -1) {

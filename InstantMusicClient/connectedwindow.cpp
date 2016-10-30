@@ -135,6 +135,9 @@ int ConnectedWindow::download_song(QString song_name)
 
 void ConnectedWindow::fetch_music(QModelIndex index)
 {
+    if(!is_destroyed) {
+        stop_music();
+    }
     QString song_name = index.data().toString();
     QString message(song_name);
     message.prepend("Selected: ");
