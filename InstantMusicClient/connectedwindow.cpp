@@ -24,7 +24,6 @@ ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
     connect(ui->uploadButton, SIGNAL(clicked(bool)), this, SLOT(open_file_browser()));
 
     ui->progressBar->hide();
-    ui->playProgress->setValue(0);
     list_music();
 }
 
@@ -163,7 +162,7 @@ int ConnectedWindow::download_song(QString song_name)
             received += nob;
             percentage = (received/file_head.filesize)*100;
             ui->progressBar->setValue(percentage);
-            if(nob < BUFFER_SIZE)
+            if(received >= file_head.filesize)
                 break;
         }
         ::close(fd);
