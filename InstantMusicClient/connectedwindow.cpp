@@ -125,7 +125,6 @@ void ConnectedWindow::setup_music_player(QString song_name)
     label_text.append(song_name);
 
     ui->label_3->setText(label_text);
-    ui->progressBar->hide();
 }
 
 int ConnectedWindow::download_song(QString song_name)
@@ -157,11 +156,15 @@ int ConnectedWindow::download_song(QString song_name)
         int nob;
         int received = 0;
         int percentage;
+        int limit = 10;
         while((nob = ::recv(s_info.sockfd, c, BUFFER_SIZE, 0)) > 0) {
             write(fd, c, nob);
             received += nob;
             percentage = (received/file_head.filesize)*100;
-            ui->progressBar->setValue(percentage);
+            if(percentage > limit) {
+                ui->progressBar->setValue(percentage);
+                ui->progressBar->repaint();
+            }
             if(received >= file_head.filesize)
                 break;
         }
