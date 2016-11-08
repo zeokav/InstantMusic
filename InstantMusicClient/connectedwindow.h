@@ -8,6 +8,8 @@
 #include <QString>
 #include <QDir>
 #include <QFileDialog>
+#include <QThread>
+#include <QtConcurrent/QtConcurrent>
 #include <QtMultimedia/QMediaPlayer>
 #include "../common.hpp"
 
@@ -33,6 +35,7 @@ private slots:
 
 private:
     Ui::ConnectedWindow *ui;
+    void updatebar();
     server_info s_info;
     void setup_music_player(QString);
     int download_song(QString);

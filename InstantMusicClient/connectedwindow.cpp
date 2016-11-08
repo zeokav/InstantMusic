@@ -23,6 +23,7 @@ ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
     connect(ui->stopButton, SIGNAL(clicked(bool)), this, SLOT(stop_music()));
     connect(ui->uploadButton, SIGNAL(clicked(bool)), this, SLOT(open_file_browser()));
 
+    ui->playedProgress->setValue(0);
     ui->progressBar->hide();
     list_music();
 }
@@ -110,6 +111,21 @@ void ConnectedWindow::stop_music()
     }
 }
 
+void ConnectedWindow::updatebar() {
+    qint64 played = 0;
+    qint64 ticker = 0;
+    qint64 old = 0;
+    while(is_playing) {
+       played = player->position();
+       old = ticker;
+       ticker = played / 1000;
+       if(old != ticker){
+           ui->playedProgress->setValue((played/player->duration()) * 100);
+           ui->playedProgress->repaint();
+       }
+    }
+}
+
 void ConnectedWindow::setup_music_player(QString song_name)
 {
     player = new QMediaPlayer;
@@ -118,6 +134,7 @@ void ConnectedWindow::setup_music_player(QString song_name)
     player->setMedia(QUrl::fromLocalFile(mediaPath));
     player->setVolume(50);
     player->play();
+//    QtConcurrent::run(this, &ConnectedWindow::updatebar);
     is_playing = true;
     is_destroyed = false;
 
@@ -168,6 +185,7 @@ int ConnectedWindow::download_song(QString song_name)
             if(received >= file_head.filesize)
                 break;
         }
+        ui->progressBar->hide();
         ::close(fd);
         qDebug() << "File received!";
         return 1;
