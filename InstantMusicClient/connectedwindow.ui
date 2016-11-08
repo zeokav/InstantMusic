@@ -159,12 +159,28 @@
      <rect>
       <x>10</x>
       <y>320</y>
-      <width>501</width>
+      <width>421</width>
       <height>23</height>
      </rect>
     </property>
     <property name="value">
      <number>24</number>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="duration">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>320</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>

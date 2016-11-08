@@ -25,6 +25,7 @@ ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
     connect(this, SIGNAL(progressChanged(int)), this, SLOT(change_bar(int)));
 
     ui->playedProgress->setValue(0);
+    ui->playedProgress->setTextVisible(false);
     ui->progressBar->hide();
     list_music();
 }
@@ -138,8 +139,14 @@ void ConnectedWindow::change_bar(int seconds) {
     qDebug() << "Seconds: " << seconds;
     int total = player->duration()/1000;
     float percentage = (float)seconds/total;
+
+    int minutes = seconds/60;
+    seconds %= 60;
+
+    ui->duration->setText(QString::number(minutes).append(":").append(QString::number(seconds)));
     ui->playedProgress->setValue(percentage*100);
     ui->playedProgress->repaint();
+
     QString str = "Seconds: ";
     ui->statusbar->showMessage(str.append(QString::number(seconds)));
 }
