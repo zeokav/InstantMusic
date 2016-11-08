@@ -25,6 +25,9 @@ public:
     explicit ConnectedWindow(server_info serv, QWidget *parent = 0);
     ~ConnectedWindow();
 
+signals:
+    void progressChanged(int seconds);
+
 private slots:
     void fetch_music(QModelIndex);
     void list_music();
@@ -32,6 +35,7 @@ private slots:
     void change_state();
     void stop_music();
     void open_file_browser();
+    void change_bar(int);
 
 private:
     Ui::ConnectedWindow *ui;

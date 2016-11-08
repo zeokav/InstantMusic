@@ -22,6 +22,7 @@ ConnectedWindow::ConnectedWindow(server_info serv, QWidget *parent) :
     connect(ui->pauseButton, SIGNAL(clicked(bool)), this, SLOT(change_state()));
     connect(ui->stopButton, SIGNAL(clicked(bool)), this, SLOT(stop_music()));
     connect(ui->uploadButton, SIGNAL(clicked(bool)), this, SLOT(open_file_browser()));
+    connect(this, SIGNAL(progressChanged(int)), this, SLOT(change_bar(int)));
 
     ui->playedProgress->setValue(0);
     ui->progressBar->hide();
@@ -102,10 +103,10 @@ void ConnectedWindow::stop_music()
         return;
     }
     if(player) {
-        is_destroyed = true;
+        is_destroyed = true;        
+        is_playing = false;
         ui->label_3->setText("");
         delete player;
-        is_playing = false;
         ui->pauseButton->setText("Pause");
         ui->statusbar->showMessage("Stopped music.");
     }
@@ -115,15 +116,32 @@ void ConnectedWindow::updatebar() {
     qint64 played = 0;
     qint64 ticker = 0;
     qint64 old = 0;
-    while(is_playing) {
-       played = player->position();
-       old = ticker;
-       ticker = played / 1000;
-       if(old != ticker){
-           ui->playedProgress->setValue((played/player->duration()) * 100);
-           ui->playedProgress->repaint();
-       }
+    int seconds = 0;
+    while(!is_destroyed) {
+        try {
+            played = player->position();
+            old = ticker;
+            ticker = played / 1000;
+            if(old != ticker){
+                seconds++;
+                emit progressChanged(seconds);
+            }
+        }
+        catch(...) {
+            return;
+        }
+
     }
+}
+
+void ConnectedWindow::change_bar(int seconds) {
+    qDebug() << "Seconds: " << seconds;
+    int total = player->duration()/1000;
+    float percentage = (float)seconds/total;
+    ui->playedProgress->setValue(percentage*100);
+    ui->playedProgress->repaint();
+    QString str = "Seconds: ";
+    ui->statusbar->showMessage(str.append(QString::number(seconds)));
 }
 
 void ConnectedWindow::setup_music_player(QString song_name)
@@ -134,7 +152,7 @@ void ConnectedWindow::setup_music_player(QString song_name)
     player->setMedia(QUrl::fromLocalFile(mediaPath));
     player->setVolume(50);
     player->play();
-//    QtConcurrent::run(this, &ConnectedWindow::updatebar);
+    QtConcurrent::run(this, &ConnectedWindow::updatebar);
     is_playing = true;
     is_destroyed = false;
 
